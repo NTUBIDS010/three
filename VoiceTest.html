@@ -1,0 +1,54 @@
+<body>
+    <div class="container">
+        <h1>語音點餐測試系統</h1>
+        <p>點擊下方按鈕，開始進行語音點餐測試：</p>
+
+        <button id="start-record-btn" class="category-button">開始語音點餐</button>
+        <div id="result" class="order-summary">
+            <h3>語音輸入內容：</h3>
+            <p id="transcript"></p>
+        </div>
+    </div>
+    <script>
+        // 確保瀏覽器支援 Web Speech API
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+        if (!window.SpeechRecognition) {
+            alert("您的瀏覽器不支援語音識別功能，請更換支援的瀏覽器。");
+        } else {
+            // 建立語音識別的實例
+            const recognition = new window.SpeechRecognition();
+            recognition.lang = 'zh-TW'; // 設置語言為中文
+            recognition.interimResults = false; // 只返回最終結果
+    
+            // 檢查是否已經授權過
+            const isAuthorized = localStorage.getItem('micAuthorized');
+    
+            if (!isAuthorized) {
+                // 第一次點擊按鈕，進行語音授權
+                document.getElementById('start-record-btn').addEventListener('click', () => {
+                    recognition.start();
+                    localStorage.setItem('micAuthorized', true); // 保存授權標記
+                });
+            } else {
+                // 如果已經授權過，直接開始錄音
+                document.getElementById('start-record-btn').addEventListener('click', () => {
+                    recognition.start();
+                });
+            }
+    
+            // 當語音識別獲得結果時，顯示在網頁上
+            recognition.addEventListener('result', (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('transcript').innerText = transcript;
+            });
+    
+            // 當語音識別結束時，準備下一次識別
+            recognition.addEventListener('end', () => {
+                console.log('識別已結束，準備下一次的錄音。');
+            });
+        }
+    </script>
+    
+</body>
+</html>
